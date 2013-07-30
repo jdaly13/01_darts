@@ -85,6 +85,7 @@ GAME.calculateAverageScore = function (currentScore, dartsThrown, gameStartValue
 			
 } // end of calculateAverageScore
 
+//seperate html logic from function logic
 GAME.updateAverageScore = function (perDart, perRound) {
 	
 	if (arguments[1] == undefined && GAME.daly == GAME.first) {
