@@ -18,19 +18,16 @@ GAME.second = "second";
 
 // here we filter out what was entered by user for score
 GAME.checkValue = function (num, score, dartsThrown, firstOrSecond) {  
-		if ((isNaN(num) || num == '' || num > 180 || num > score) && num !==0) {
-				$.colorbox({
-						inline:true, 
-						href:"#warning",
-						width:"360px",
-						height:"300px",
-						opacity:.75,
-						onComplete: function () {
-						
-						}	
-				});
-				
-			return false		
+	if ((isNaN(num) || num == '' || num > 180 || num > score) && num !==0) {
+			$.colorbox({
+				inline:true, 
+				href:"#warning",
+				width:"360px",
+				height:"300px",
+				opacity:.75
+			});
+			
+		return false		
 		} 
 	
 	if (num == score) {
@@ -45,17 +42,28 @@ GAME.checkValue = function (num, score, dartsThrown, firstOrSecond) {
 			overlayClose: false,
 			onLoad: function () {
 				$('#cboxClose').hide();
-			},
-			onComplete: function () {
-			
 			}	
 		});
 		return true
 	} 
-
-
 } // end of checkValue function
 
+
+GAME.checkForZeroValue = function (obj) {
+	var dartsthrown = (obj.first === true) ? 'dartsThrownFirst' : 'dartsThrownSecond';		
+	if (obj.playerVal === obj.gameStartValue) {
+		obj.donotUpdate = true;
+		GAME[dartsthrown] = 0;
+	} else {
+		if (obj.firstElement.text() != 0) {
+			GAME[dartsthrown] = parseInt(obj.thisEle.siblings('td.dark_border').text());
+		} else {
+			GAME[dartsthrown] = GAME[dartsthrown] + 3;
+		}
+		obj.donotUpdate = false;
+	}
+	return obj.donotUpdate;
+}
 
 GAME.outEligible = function (num) {
 	if ((num < 171) && (num > 39)) {	
@@ -74,11 +82,7 @@ GAME.outEligible = function (num) {
 
 GAME.calculateAverageScore = function (currentScore, dartsThrown, gameStartValue, startValue) {
 			var obj = {}
-		
-			//if (startValue == 0) {
-					currentScore = gameStartValue - currentScore;
-					console.log(currentScore);
-			//}			
+			currentScore = gameStartValue - currentScore;
 			obj.perRound = parseInt(currentScore / (dartsThrown / 3));
 			obj.perDart = Math.round(parseInt(currentScore / dartsThrown));
 			return obj;
@@ -86,30 +90,6 @@ GAME.calculateAverageScore = function (currentScore, dartsThrown, gameStartValue
 } // end of calculateAverageScore
 
 //seperate html logic from function logic
-GAME.updateAverageScore = function (perDart, perRound) {
-	
-	if (arguments[1] == undefined && GAME.daly == GAME.first) {
-		perRound = $('#left > div.per_round > h3 span').text();	
-	}
-	
-	if (arguments[1] == undefined && GAME.daly == GAME.second) {
-		perRound = $('#right > div.per_round > h3 span').text();	
-	}
-		
-	if (arguments[2] == "secondPlayer") { //second player
-		var perDartelement = $('#right > div.per_dart > h3 span');
-		var perRoundelement = $('#right > div.per_round > h3 span');
-	} else {  //first player
-		var perDartelement = $('#left > div.per_dart > h3 span');
-		var perRoundelement = $('#left > div.per_round > h3 span');
-	}
-	
-	
-	perDartelement.text(perDart);
-	perRoundelement.text(perRound);
-} 
-
-
 GAME.events = {};
 
 GAME.events.initialOverlay = (function () {
@@ -179,7 +159,11 @@ GAME.events.firstScore = (function () {
 				var objReturned = GAME.calculateAverageScore(GAME.first_player_value, GAME.darts_thrown, GAME.start_value);
 				GAME.avgPerDart = objReturned.perDart
 				GAME.avgPerRound = objReturned.perRound
-				GAME.updateAverageScore(GAME.avgPerDart, GAME.avgPerRound);			
+				//GAME.updateAverageScore(GAME.avgPerDart, GAME.avgPerRound);
+				var perDartelement = $('#left > div.per_dart > h3 span');
+				var perRoundelement = $('#left > div.per_round > h3 span');
+				perDartelement.text(GAME.avgPerDart);
+				perRoundelement.text(GAME.avgPerRound);				
 			}
 			
 			var cheatSheetObj = GAME.outEligible(GAME.first_player_value);
@@ -206,7 +190,10 @@ GAME.events.secondScore = (function () {
 				var objReturned = GAME.calculateAverageScore(GAME.second_player_value, GAME.darts_thrown, GAME.start_value);
 				GAME.avgPerDartSecond = objReturned.perDart
 				GAME.avgPerRoundSecond = objReturned.perRound
-				GAME.updateAverageScore(GAME.avgPerDartSecond, GAME.avgPerRoundSecond, 'secondPlayer');
+				var perDartelement = $('#right > div.per_dart > h3 span');
+				var perRoundelement = $('#right > div.per_round > h3 span');
+				perDartelement.text(GAME.avgPerDartSecond);
+				perRoundelement.text(GAME.avgPerRoundSecond);
 			}
 			$this.parent().next().children('.one').attr('contenteditable', true);
 			
@@ -224,84 +211,83 @@ GAME.events.firstPersonScoring = (function () {
 		if (event.keyCode == 9 || event.keyCode == 13 ) {
 			var start_value = parseInt($.trim($this.text()));
 			$this.text(start_value);
-			var value_tosubtract = parseInt($this.parent().prev().children('td.two').text()); // probably change this later to be less "hard coded"
-			//var value_tosubtract = GAME.first_player_value
+			var value_tosubtract = GAME.first_player_value;
 			var first_player_value = value_tosubtract - start_value;
-			GAME.first_player_value = GAME.first_player_value - start_value;
-			if (first_player_value === GAME.start_value) {
-				donotUpdate = true;
-				GAME.dartsThrownFirst = 0;
-			} else {
-				if ($('#start').text() != 0) {
-					GAME.dartsThrownFirst = parseInt($this.siblings('td.dark_border').text());
-				} else {
-					GAME.dartsThrownFirst = GAME.dartsThrownFirst + 3;
-				}
-				donotUpdate = false;
+			var returnedValue = GAME.checkValue(start_value, value_tosubtract, GAME.dartsThrownFirst, GAME.first);
+			if (returnedValue == false) {
+				$this.text('');
+				event.preventDefault();
+				return false;
 			}
-				
-				var returnedValue = GAME.checkValue(start_value, value_tosubtract, GAME.dartsThrownFirst, GAME.first);
-				if (returnedValue == false) {
-					$this.text('');
-					event.preventDefault();
-					return false;
-				}
-				
-				if (donotUpdate === false) {
-					var objReturned = GAME.calculateAverageScore(first_player_value, GAME.dartsThrownFirst, GAME.start_value, start_value );
-					GAME.avgPerDart = objReturned.perDart
-					GAME.avgPerRound = objReturned.perRound
-					GAME.updateAverageScore(GAME.avgPerDart, GAME.avgPerRound);			
-				}
+			
+			donotUpdate = GAME.checkForZeroValue({
+				playerVal:first_player_value, 
+				gameStartValue:GAME.start_value,
+				firstElement:$('#start'),
+				thisEle: $this,
+				donotUpdate:null,
+				first:true
+			});
+								
+			if (donotUpdate === false) {
+				var objReturned = GAME.calculateAverageScore(first_player_value, GAME.dartsThrownFirst, GAME.start_value, start_value );
+				GAME.avgPerDart = objReturned.perDart
+				GAME.avgPerRound = objReturned.perRound
+				var perDartelement = $('#left > div.per_dart > h3 span');
+				var perRoundelement = $('#left > div.per_round > h3 span');
+				perDartelement.text(GAME.avgPerDart);
+				perRoundelement.text(GAME.avgPerRound);					
+			}
 				
 				var cheatSheetObj = GAME.outEligible(first_player_value);
 				$this.next().text(first_player_value).addClass(cheatSheetObj.out).next().next().attr('contenteditable', true);
-			
+				GAME.first_player_value = first_player_value
 		}
 	});
-}())
+}());
 
 //right side scoring whose second scoring
 GAME.events.SecondPlayerScoring = (function () {
 	$('table').on('keydown', 'td.three', function (event) {
 		var donotUpdate = null;
 		var $this = $(this);
-		var subtracted_value;
 		var table_row = $("<tr class='inserted'><td class='one' contenteditable='true'></td><td class='two'></td><td class='dark_border'><span></span></td><td class='three last'></td><td class='four'> </td></tr>");
 		if (event.keyCode == 9 || event.keyCode == 13 ) {
 			var previous_row = $this.parent().prev();
 			var start_value = parseInt($.trim($this.text()));
 			$this.text(start_value);
-			var value_tosubtract = parseInt(previous_row.children('td.four').text());
+			//var value_tosubtract = parseInt(previous_row.children('td.four').text());
+			var value_tosubtract = GAME.second_player_value;
 			var second_player_value = value_tosubtract - start_value;
-			if (second_player_value === GAME.start_value) {
-				donotUpdate = true;
-				GAME.dartsThrownSecond = 3;
-			} else {	
-				if ($('#second_start').text() != 0) {
-					GAME.dartsThrownSecond = parseInt($this.siblings('td.dark_border').text())
-				} else {
-					GAME.dartsThrownSecond = GAME.dartsThrownSecond + 3;
-				}
-				donotUpdate = false;
-			}
-			var darts_next_round = parseInt($this.siblings('td.dark_border').text()) + 3;
 			var returnedValue = GAME.checkValue(start_value, value_tosubtract, GAME.dartsThrownSecond, GAME.second);
 			if (returnedValue == false) {
 				$this.text('');
 				event.preventDefault();
 				return false;
 			}
+			donotUpdate = GAME.checkForZeroValue({
+				playerVal:second_player_value, 
+				gameStartValue:GAME.start_value,
+				firstElement:$('#second_start'),
+				thisEle: $this,
+				donotUpdate:null,
+				first:false
+			});
+			var darts_next_round = parseInt($this.siblings('td.dark_border').text()) + 3;
+			
 		
 			if (donotUpdate === false) {
 				var objReturned = GAME.calculateAverageScore(second_player_value, GAME.dartsThrownSecond, GAME.start_value);
 				GAME.avgPerDartSecond = objReturned.perDart
 				GAME.avgPerRoundSecond  = objReturned.perRound
-				GAME.updateAverageScore(GAME.avgPerDartSecond, GAME.avgPerRoundSecond, 'secondPlayer');
+				var perDartelement = $('#right > div.per_dart > h3 span');
+				var perRoundelement = $('#right > div.per_round > h3 span');
+				perDartelement.text(GAME.avgPerDartSecond);
+				perRoundelement.text(GAME.avgPerRoundSecond);
 			}
 			var cheatSheetObj = GAME.outEligible(second_player_value);
 			$this.next().text(second_player_value).addClass(cheatSheetObj.out);
-			
+			GAME.second_player_value = second_player_value;
 			//here we determine if it's the last row of the table if so we append it
 			if ($this.closest("tr").is(":last-child")) {
 				table_row.find('td.dark_border').text(darts_next_round).end().appendTo('#middle table');
