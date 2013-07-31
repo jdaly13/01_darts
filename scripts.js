@@ -1,7 +1,7 @@
 
 (function (w,d) {
 // we declare our GAME properties here before we give them values in our script
-w.GAME = GAME = {}
+w.GAME = GAME = {};
 GAME.start_value = null;
 GAME.first_player_value = null;
 GAME.second_player_value = null;
@@ -11,6 +11,19 @@ GAME.daly = null;
 GAME.who_won = null;
 GAME.dartsThrownFirst = 0;
 GAME.dartsThrownSecond = 0;
+
+GAME.defaults = {
+	firstStart: '#start',
+	secondStart: '#second_start',
+	notValidPopUp: '#warning',
+	colorboxWidth: '360px',
+	colorboxHeight: '300px',
+	colorboxOpacity: .75,
+	gameOverPopUp: '#game_over',
+	dartsThrownColumn: 'td.dark_border'
+	// perDart left and right side
+
+}
 
 // common strings we use to determine first or second player
 GAME.first = "first";
@@ -78,7 +91,6 @@ GAME.outEligible = function (num) {
 			}
 	}
 }
-
 
 GAME.calculateAverageScore = function (currentScore, dartsThrown, gameStartValue, startValue) {
 			var obj = {}
@@ -159,7 +171,6 @@ GAME.events.firstScore = (function () {
 				var objReturned = GAME.calculateAverageScore(GAME.first_player_value, GAME.darts_thrown, GAME.start_value);
 				GAME.avgPerDart = objReturned.perDart
 				GAME.avgPerRound = objReturned.perRound
-				//GAME.updateAverageScore(GAME.avgPerDart, GAME.avgPerRound);
 				var perDartelement = $('#left > div.per_dart > h3 span');
 				var perRoundelement = $('#left > div.per_round > h3 span');
 				perDartelement.text(GAME.avgPerDart);
