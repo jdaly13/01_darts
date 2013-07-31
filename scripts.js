@@ -11,6 +11,9 @@ GAME.daly = null;
 GAME.who_won = null;
 GAME.dartsThrownFirst = 0;
 GAME.dartsThrownSecond = 0;
+// common strings we use to determine first or second player
+GAME.first = "first";
+GAME.second = "second";
 
 GAME.defaults = {
 	firstStart: '#start',
@@ -24,11 +27,6 @@ GAME.defaults = {
 	// perDart left and right side
 
 }
-
-// common strings we use to determine first or second player
-GAME.first = "first";
-GAME.second = "second";
-
 // here we filter out what was entered by user for score
 GAME.checkValue = function (num, score, dartsThrown, firstOrSecond) {  
 	if ((isNaN(num) || num == '' || num > 180 || num > score) && num !==0) {
@@ -155,7 +153,7 @@ GAME.events.firstScore = (function () {
 	$('#start').on('keydown', function (event) {
 		var $this = $(this);
 		if (event.keyCode == 9 || event.keyCode == 13 ) { // enter or tab keys
-			var start_value = parseInt($.trim($this.text())); // we get value of whatever is entered no need to parse integer
+			var start_value = parseInt($.trim($this.text())); 
 			$this.text(start_value);
 			GAME.darts_thrown = 3;
 			if (start_value === 0) { 			
