@@ -1,0 +1,63 @@
+		// first score
+	/*	GAME.events.firstScore = function () {
+			$('#start').on('keydown', function (event) {
+				var $this = $(this);
+				if (event.keyCode == 9 || event.keyCode == 13 ) { // enter or tab keys
+					var start_value = parseInt($.trim($this.text())); 
+					$this.text(start_value);
+					GAME.darts_thrown = 3;
+					if (start_value === 0) { 			
+						GAME.first_player_value = GAME.start_value
+					} else {
+						var returnedValue = GAME.checkValue(start_value, GAME.start_value, GAME.darts_thrown, GAME.first);
+						if (returnedValue == false) {
+							$this.text('');
+							event.preventDefault();				
+							return false;
+						} 
+						GAME.first_player_value = GAME.start_value - start_value; //subtract the new score
+						var objReturned = GAME.calculateAverageScore(GAME.first_player_value, GAME.darts_thrown, GAME.start_value);
+						GAME.avgPerDart = objReturned.perDart
+						GAME.avgPerRound = objReturned.perRound
+						var perDartelement = $('#left > div.per_dart > h3 span');
+						var perRoundelement = $('#left > div.per_round > h3 span');
+						perDartelement.text(GAME.avgPerDart);
+						perRoundelement.text(GAME.avgPerRound);				
+					}
+					
+					var cheatSheetObj = GAME.outEligible(GAME.first_player_value);
+					$this.next().text(GAME.first_player_value).addClass(cheatSheetObj.out); //place new score in points to go box
+				}
+			});
+		};  */
+
+		//second score
+		/*GAME.events.secondScore = function () {
+			$('#second_start').on('keydown', function (event) {
+				var $this = $(this);
+				if (event.keyCode == 9 || event.keyCode == 13 ) {
+					var start_value = parseInt($.trim($this.text()));
+					$this.text(start_value);
+					GAME.second_player_value = GAME.start_value - start_value;		
+					if (start_value != 0) {
+						var returnedValue = GAME.checkValue(start_value, GAME.start_value, GAME.darts_thrown, GAME.second );
+						if (returnedValue == false) {
+							$this.text('');
+							event.preventDefault();
+							return false;
+						}
+						var objReturned = GAME.calculateAverageScore(GAME.second_player_value, GAME.darts_thrown, GAME.start_value);
+						GAME.avgPerDartSecond = objReturned.perDart
+						GAME.avgPerRoundSecond = objReturned.perRound
+						var perDartelement = $('#right > div.per_dart > h3 span');
+						var perRoundelement = $('#right > div.per_round > h3 span');
+						perDartelement.text(GAME.avgPerDartSecond);
+						perRoundelement.text(GAME.avgPerRoundSecond);
+					}
+					$this.parent().next().children('.one').attr('contenteditable', true);
+					
+					var cheatSheetObj = GAME.outEligible(GAME.second_player_value);
+					$this.next().text(GAME.second_player_value).addClass(cheatSheetObj.out);
+				}
+			});
+		}; */
