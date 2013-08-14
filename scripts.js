@@ -8,26 +8,35 @@
 		GAME.second_player_value = null;
 		GAME.darts_thrown = null;
 		GAME.extra_row = null;
-		GAME.daly = null;
+		GAME.mainPlayer = null;
 		GAME.who_won = null;
 		GAME.dartsThrownFirst = 3;
 		GAME.dartsThrownSecond = 3;
 		// common strings we use to determine first or second player
 		GAME.first = "first";
 		GAME.second = "second";
-		//seperate html logic from function logic
-		GAME.events = {};
+		
+		GAME.events = {}; //seperate html logic from function logic
 
 		GAME.defaults = {
 			firstStart: '#start',
 			secondStart: '#second_start',
 			notValidPopUp: '#warning',
 			colorboxWidth: '360px',
-			colorboxHeight: '300px',
+			colorboxHeight: '500px',
 			colorboxOpacity: .75,
 			gameOverPopUp: '#game_over',
-			dartsThrownColumn: 'td.dark_border'
-			// perDart left and right side
+			dartsThrownColumn: 'td.dark_border',
+			inline:true,
+			gameOver:"#game_over",
+			onLoad: function () { $('#cboxClose').hide(); },
+			whichGame: "#which_game",
+			yourTeam: "Daly's",
+			whichPlayer: "#which_player",
+			firstShooter: "#left h1 span",
+			secondShooter: "#right h1 span",
+			newGameButton: "#new_game",
+			perDartElementFirst: "#left > div.per_dart > h3 span"
 		}
 		
 		GAME.settings = $.extend({}, GAME.defaults, options);
@@ -35,11 +44,11 @@
 		GAME.checkValue = function (num, score, dartsThrown, firstOrSecond) {  
 			if ((isNaN(num) || num == '' || num > 180 || num > score) && num !==0) {
 					$.colorbox({
-						inline:true, 
+						inline:GAME.settings.inline, 
 						href:GAME.settings.notValidPopUp,
-						width:"360px",
-						height:"300px",
-						opacity:.75
+						width:GAME.settings.colorboxWidth,
+						height:GAME.settings.colorboxHeight,
+						opacity:GAME.settings.colorboxOpacity
 					});
 					
 				return false		
@@ -49,11 +58,11 @@
 				GAME.darts_thrown = dartsThrown;
 				GAME.who_won = firstOrSecond;
 				$.colorbox({
-					inline:true, 
-					href:"#game_over",
-					width:"360px",
-					height:"500px",
-					opacity:.75,
+					inline:GAME.settings.inline, 
+					href:GAME.settings.gameOverPopUp,
+					width:GAME.settings.colorboxWidth,
+					height:GAME.settings.colorboxHeight,
+					opacity:GAME.settings.colorboxOpacity,
 					overlayClose: false,
 					onLoad: function () {
 						$('#cboxClose').hide();
@@ -63,7 +72,6 @@
 			} 
 		} // end of checkValue function
 
-
 		GAME.checkForZeroValue = function (obj) {
 			var dartsthrown = (obj.first === true) ? 'dartsThrownFirst' : 'dartsThrownSecond';		
 			if (obj.playerVal === obj.gameStartValue) {
@@ -71,7 +79,7 @@
 				GAME[dartsthrown] = 0;
 			} else {
 				if (obj.firstElement.text() != 0) {
-					GAME[dartsthrown] = parseInt(obj.thisEle.siblings('td.dark_border').text());
+					GAME[dartsthrown] = parseInt(obj.thisEle.siblings(GAME.settings.dartsThrownColumn).text());
 				} else {
 					GAME[dartsthrown] = GAME[dartsthrown] + 3;
 				}
@@ -105,30 +113,32 @@
 
 
 		GAME.events.initialOverlay = function () {
+			$('#myForm #block p').next('label').text(GAME.settings.yourTeam).next('input').val(GAME.settings.yourTeam);
+			$('#myForm #block').next('div').children('label').text(GAME.settings.yourTeam + ' player');
 			$('#myForm a').on('click', function (e) { // initial overlay form
 				var valueOfUnchecked;
-				var which_game = $('#which_game').val(); // select box to choose value of 01 game e.g. 301
-				var which_player = $('#which_player').val(); // The Daly's player name	
+				var which_game = $(GAME.settings.whichGame).val(); // select box to choose value of 01 game e.g. 301
+				var which_player = $(GAME.settings.whichPlayer).val(); // The main player's name	
 				if (which_player == '') { // some form validation to make sure box isn't empty
-					$('#which_player').prev().prev().html("<span style='font-weight:bold'>please write in a player name!</span>");
+					$(GAME.settings.whichPlayer).prev().prev().html("<span style='font-weight:bold'>please write in a player name!</span>");
 					return false;
 				}
 				$('#middle table td.to_go').text(which_game); // show game value within table
 				GAME.start_value = parseInt(which_game); // make the start value a property of the main OBJECT
-				which_player = "Daly's Shooter: " + which_player;  //append which Player value to add Daly's shooter
-				var valueOfTheCheckedRadio = $('[name=who_goes]:checked').val(); // checked value to see who goes first
-				if (valueOfTheCheckedRadio === "Daly's") {
-					GAME.daly = "first";
+				which_player = GAME.settings.yourTeam + " Shooter: " + which_player;  //append which Player value to yourTeam's shooter
+				var valueOfTheCheckedRadio = $('[name=who_goes]:checked').val(); // checked value to see who goes first radio button
+				if (valueOfTheCheckedRadio === GAME.settings.yourTeam) {
+					GAME.mainPlayer = "first";
 					$('#left h2 span').text(which_player).parent().removeClass('hide');
 					valueOfUnchecked = "Away"
 				} else {
-					GAME.daly = "second";
+					GAME.mainPlayer = "second";
 					$('#right h2 span').text(which_player).parent().removeClass('hide');
-					valueOfUnchecked = "Daly"
+					valueOfUnchecked = GAME.settings.yourTeam
 				}
 				
-				$('#left h1 span').text(valueOfTheCheckedRadio);
-				$('#right h1 span').text(valueOfUnchecked);
+				$(GAME.settings.firstShooter).text(valueOfTheCheckedRadio);
+				$(GAME.settings.secondShooter).text(valueOfUnchecked);
 				
 				$.colorbox.close();
 				e.preventDefault();
@@ -136,17 +146,17 @@
 			})
 		};
 
-		// the first box is highlighted as user cue - we remove color on click focus whatevs
+		// the first box is highlighted as user cue - we remove color on click focus 
 		GAME.events.firstClick = function () {
-			$('#start').on('focus', function () {
+			$(GAME.settings.firstStart).on('focus', function () {
 				$(this).css('background-color', 'white');
 			});
 		};
 
 
-		// temporary hopefully to clear out board for each new game start
+		// clear out board for each new game start - client side approach
 		GAME.events.newGAME = function () {
-			$('#new_game').on("click", function () {
+			$(GAME.settings.newGameButton).on("click", function () {
 				window.location.reload(true);
 			});
 		};
@@ -185,7 +195,7 @@
 					donotUpdate = GAME.checkForZeroValue({
 						playerVal:first_player_value, 
 						gameStartValue:GAME.start_value,
-						firstElement:$('#start'),
+						firstElement:$(GAME.settings.firstStart),
 						thisEle: $this,
 						donotUpdate:null,
 						first:true
@@ -213,6 +223,7 @@
 			$('table').on('keydown', 'td.three', function (event) {
 				var donotUpdate = null;
 				var $this = $(this);
+				// we append this table row after a certain amount
 				var table_row = $("<tr class='inserted'><td class='one' contenteditable='true'></td><td class='two'></td><td class='dark_border'><span></span></td><td class='three last'></td><td class='four'> </td></tr>");
 				if (event.keyCode == 9 || event.keyCode == 13 ) {
 					var start_value = parseInt($.trim($this.text()));
@@ -241,7 +252,7 @@
 					donotUpdate = GAME.checkForZeroValue({
 						playerVal:second_player_value, 
 						gameStartValue:GAME.start_value,
-						firstElement:$('#second_start'),
+						firstElement:$(GAME.settings.secondStart),
 						thisEle: $this,
 						donotUpdate:null,
 						first:false
@@ -275,18 +286,25 @@
 		GAME.events.finishGAME = function () {
 			$('#game_over').on('click', 'a.block', function (event) {
 					var which_dart = $(this).attr('data-val');
-					var oldValue = GAME.darts_thrown;
-					GAME.darts_thrown = GAME.darts_thrown - which_dart;
+					var howMany = GAME.who_won === GAME.first ? GAME.dartsThrownFirst : GAME.dartsThrownSecond;
+					console.log(howMany);
+					GAME.darts_thrown = howMany - which_dart;
 					var nextDiv = $(this).parent().hide().next();
 					nextDiv.removeClass('hide');
-					if (GAME.who_won != GAME.daly) {
+					if (GAME.who_won != GAME.mainPlayer) {
 						var winner = "AWAY"
 						nextDiv.children('h3').find('span').text(winner).end().siblings('h4, h5').hide();
 					} else {
-						var averageScoreObj = GAME.calculateAverageScore(0, GAME.darts_thrown, GAME.start_value, true);
-						var winner = "Daly's Pub";
-						nextDiv.find('h3 span').text(winner).parent().next().find('span').text(averageScoreObj.perDart);
-						GAME.updateAverageScore(averageScoreObj.perDart);
+						var objReturned = GAME.calculateAverageScore(0, GAME.darts_thrown, GAME.start_value);
+						GAME.avgPerDart = objReturned.perDart
+						GAME.avgPerRound = objReturned.perRound
+						var winner = GAME.settings.yourTeam;
+						nextDiv.find('h3 span').text(winner).parent().next().find('span').text(GAME.avgPerDart);
+						var div = (GAME.mainPlayer === GAME.first) ? "#left" : "#right"
+						var perDartelement = $(div + ' > div.per_dart > h3 span');
+						var perRoundelement = $(div + ' > div.per_round > h3 span');
+						perDartelement.text(GAME.avgPerDart);
+						perRoundelement.text(GAME.avgPerRound);
 					}
 					
 					$('#done').click(function() {
@@ -318,30 +336,33 @@
 				}(cellValue)
 			});
 		};
+		
+		// function for outTable to add classes to each value - me being lazy and being a programmer
+		GAME.events.lazyTable = function () {
+		  var theTable = document.getElementById('outTable');
+		  var rowLength = theTable.firstElementChild.rows.length
+
+			for(i=0; i <rowLength; i++) {
+				var tr = theTable.firstElementChild.rows[i];
+				var tdLength = tr.children.length
+				for(j=0; j<tdLength; j++) {
+				   var num = parseInt(tr.children[j].innerHTML)
+				   tr.children[j].className = "v" + num
+				}
+			}
+		};
 
 		// end of GAME.events
 
-		// function for outTable to add classes to each value - me being lazy and being a programmer
-		// this function is called on PAGE load wrapped in anonymous function
-		(function () {
-			  var theTable = document.getElementById('outTable');
-			  var rowLength = theTable.firstElementChild.rows.length
 
-				for(i=0; i <rowLength; i++) {
-					var tr = theTable.firstElementChild.rows[i];
-					var tdLength = tr.children.length
-					for(j=0; j<tdLength; j++) {
-					   var num = parseInt(tr.children[j].innerHTML)
-					   tr.children[j].className = "v" + num
-					}
-				}
-				
-				// call overlay on Page Load
-				$.colorbox({
+
+
+		GAME.init = function () {
+			$.colorbox({
 					inline:true, 
 					href:"#myForm",
-					width:"360px",
-					height:"500px",
+					width:GAME.settings.colorboxWidth,
+					height:GAME.settings.colorboxHeight,
 					opacity:.75,
 					overlayClose: false,
 					onLoad: function () {
@@ -353,17 +374,15 @@
 							return false;
 						}
 					}	
-				}); // this is called on page load first introductory box
-		})();
-
-		GAME.init = function () {
+			}); 
+			GAME.events.lazyTable();
 			GAME.events.initialOverlay();
 			GAME.events.firstClick();
-			GAME.events.newGAME();
 			GAME.events.firstPersonScoring ();
 			GAME.events.SecondPlayerScoring ();
-			GAME.events.finishGAME ();
 			GAME.events.outChart();
+			GAME.events.finishGAME ();
+			GAME.events.newGAME();
 		}
 
 		
@@ -374,7 +393,7 @@
 	}
 }(window, document));
 
-$().dartScore({colorboxWidth:'500px'});
+$().dartScore({colorboxWidth:'400px'});
 
 
 
