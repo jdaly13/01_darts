@@ -16,7 +16,7 @@
 		GAME.first = "first";
 		GAME.second = "second";
 		
-		GAME.events = {}; //seperate html logic from function logic
+		GAME.events = {}; //seperate html logic for function logic
 
 		GAME.defaults = {
 			firstStart: '#start',
@@ -341,7 +341,6 @@
 		GAME.events.lazyTable = function () {
 		  var theTable = document.getElementById('outTable');
 		  var rowLength = theTable.firstElementChild.rows.length
-
 			for(i=0; i <rowLength; i++) {
 				var tr = theTable.firstElementChild.rows[i];
 				var tdLength = tr.children.length
@@ -351,23 +350,18 @@
 				}
 			}
 		};
-
-		// end of GAME.events
-
-
-
-
-		GAME.init = function () {
+		
+		// initial overlay
+		GAME.events.initialEvent = function () {		
 			$.colorbox({
 					inline:true, 
 					href:"#myForm",
 					width:GAME.settings.colorboxWidth,
 					height:GAME.settings.colorboxHeight,
-					opacity:.75,
+					opacity:GAME.settings.colorboxOpacity,
 					overlayClose: false,
-					onLoad: function () {
-						$('#cboxClose').hide();
-					},
+					onOpen: GAME.settings.onLoad,
+					onLoad:GAME.events.initialOverlay,
 					onClosed: function () {
 						var which_player = $('#which_player').val();
 						if (which_player == '') {
@@ -375,17 +369,19 @@
 						}
 					}	
 			}); 
-			GAME.events.lazyTable();
-			GAME.events.initialOverlay();
-			GAME.events.firstClick();
-			GAME.events.firstPersonScoring ();
-			GAME.events.SecondPlayerScoring ();
-			GAME.events.outChart();
-			GAME.events.finishGAME ();
-			GAME.events.newGAME();
-		}
-
+		};
+		// end of GAME.events
 		
+		GAME.init = function () {
+				GAME.events.lazyTable();
+				GAME.events.initialEvent();
+				GAME.events.firstClick();
+				GAME.events.firstPersonScoring ();
+				GAME.events.SecondPlayerScoring ();
+				GAME.events.outChart();
+				GAME.events.finishGAME ();
+				GAME.events.newGAME();
+		};
 
 		GAME.init();
 	  

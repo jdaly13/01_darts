@@ -15,4 +15,20 @@ This application will keep the average score per dart and average score per roun
 
 Also when within a 3 dart out you'll notice a background image of a dart - click on it and a out chart will appear with the number you highlighted
 
+you can use this as a jquery Plugin $().dartScore();
+
+the function only takes one argument and that's an object with settings
+
+firstStart: (jquery object) this is the first element that is scored in the game
+
+e.g. "#first"
+
+secondStart: (jquery object) this is the first element that is scored in the game
+
+e.g. "#second"
+
+secondStart: (jquery object) colorbox element setting to show score is invalid
+
+e.g. "#warning"
+
 To be continued...
