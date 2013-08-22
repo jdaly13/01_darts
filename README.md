@@ -5,7 +5,9 @@ Dart scoring application
 
 This application is meant to score '01' games in dart anywhere from 101 to 1001
 
-Dependecies include a reset.css, jQuery 1.7 and above, colorbox.js (jquery modal plugin)
+3 main files are index.html, style.css, scripts.js 
+
+Dependecies include reset.css, jQuery 1.7 and above, colorbox.js (jquery modal plugin), and of course html in index.html	
 
 Compatible Browsers are recent versions of FF and Chrome (IE doesn't allow contenteditalbe attribute on table cells directly would need to amend)
 
@@ -17,18 +19,48 @@ Also when within a 3 dart out you'll notice a background image of a dart - click
 
 you can use this as a jquery Plugin $().dartScore();
 
-the function only takes one argument and that's an object with settings
+the function only takes one argument and that's an object with the following settings
 
-firstStart: (jquery object) this is the first element that is scored in the game
+firstStart: (jquery object) this is the first html element that is scored in the game
 
-e.g. "#first"
+e.g./default "#first"
 
-secondStart: (jquery object) this is the first element that is scored in the game
+secondStart: (jquery object) this is the first html element that is scored in the game
 
-e.g. "#second"
+e.g./default "#second"
 
-secondStart: (jquery object) colorbox element setting to show score is invalid
+secondStart: (jquery object) colorbox html element setting to show score is invalid
 
-e.g. "#warning"
+e.g./default "#warning"
+
+NEED TO FINISH BELOW OPTIONS
+
+colorboxWidth:
+
+colorboxHeight:
+
+colorboxOpacity:
+
+gameOverPopUp: 
+
+inline:
+
+gameOver:
+
+onLoad:
+
+whichGame:
+
+whichPlayer:
+
+yourTeam:
+
+firstShooter:
+
+secondShooter:
+
+newGameButton:
+
+perDartElementFirst:
 
 To be continued...
