@@ -11,7 +11,7 @@ Dependecies include reset.css, jQuery 1.7 and above, colorbox.js (jquery modal p
 
 Compatible Browsers are recent versions of FF and Chrome (IE doesn't allow contenteditalbe attribute on table cells directly would need to amend)
 
-working version (not always most up to date) http://dalydd.com/projects/dartboard_scoring/index.html
+working version (not always most up to date) http://darts.surge.sh
 
 This application will keep the average score per dart and average score per round
 
